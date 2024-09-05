@@ -68,6 +68,20 @@ const SignIn = () => {
             />
             <Icon type="font-awesome" name="eye" color="#6c6c6c" />
           </View>
+          {errors.password && touched.password && (
+            <Text style={styles.errorText}>{errors.password}</Text>
+          )}
+          <Text style={styles.passwordHint}>Must be at least 8 characters</Text>
+
+          <TouchableOpacity
+            style={styles.signUpButton}
+            onPress={() => handleSubmit()}
+          >
+            <Text style={styles.signUpButtonText}>Sign In</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.googleButton}>
+            <Text style={styles.googleButtonText}>Sign In with Google</Text>
+          </TouchableOpacity>
         </View>
       )}
     </Formik>
