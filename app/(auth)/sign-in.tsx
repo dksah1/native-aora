@@ -1,50 +1,45 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  Alert,
-  ScrollView,
-} from "react-native";
+import { StyleSheet, Text, View, Image, Alert, ScrollView } from "react-native";
 import React, { useState } from "react";
-import { Icon } from "react-native-elements";
-import { Formik } from "formik";
-import * as Yup from "yup";
-import * as ImagePicker from "expo-image-picker";
+
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "../../constants";
 import FormField from "@/components/FormField";
 import CustomButton from "@/components/CustomButton";
+import { Link, router } from "expo-router";
+import { SignIn } from "@/lib/appwrite";
 
-const SignInSchema = Yup.object().shape({
-  email: Yup.string().email("Invalid Email").required("Email is Required"),
-  password: Yup.string()
-    .min(8, "Password must be atleast 8 characters")
-    .required("Passwprd is required"),
-});
-
-const SignIn = () => {
+const Signin = () => {
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [image, setImage] = useState<string | null>(null);
+  const handleSubmitForm = async (values: {
+    email: string;
+    password: string;
+  }) => {
+    if (!form.email || !form.password) {
+      Alert.alert("Error", "Please fill all the fields");
+    }
 
-  const handleSubmitForm = (values: { email: string; password: string }) => {
-    Alert.alert(
-      "Form Submitted",
-      `Email: ${values.email} Password: ${values.password} `
-    );
+    setIsSubmitting(true);
+
+    try {
+      const result = await SignIn(form.email, form.password);
+      // set it to global state
+      router.replace("/home");
+    } catch (error: any) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView>
-        <View className="w-full justify-center min-h-[85vh] px-4 my-6">
+        <View className="w-full justify-center min-h-[83vh] px-4 my-6">
           <Image
             source={images.logo}
             resizeMode="contain"
@@ -70,7 +65,7 @@ const SignIn = () => {
           />
           <CustomButton
             title="Sign In"
-            handlePress={SignIn}
+            handlePress={handleSubmitForm}
             containerStyles="mt-7"
             isLoading={isSubmitting}
           />
@@ -78,6 +73,12 @@ const SignIn = () => {
             <Text className="text-lg text-gray-100 font-pregular">
               Don't have an account?
             </Text>
+            <Link
+              href="/sign-up"
+              className="text-lg font-psemibold text-secondary"
+            >
+              SignUp
+            </Link>
           </View>
         </View>
       </ScrollView>
@@ -85,7 +86,7 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default Signin;
 
 // <Formik
 //   initialValues={{ email: "", password: "" }}
